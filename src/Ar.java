@@ -203,32 +203,26 @@ class Calculation {
         int smallContainersCount = 0;
         double totalPrice = 0;
 
-        while (totalWeight > 0 && totalVolume > 0) {
-            if (totalWeight <= bigContainer.getMaxWeight() && totalVolume <= bigContainer.calculateVolume()) {
-                bigContainersCount++;
-                totalPrice += bigContainer.calculatePrice(totalWeight);
-                totalWeight -= bigContainer.getMaxWeight();
-                totalVolume -= bigContainer.calculateVolume();
-            } else if (totalWeight <= smallContainer.getMaxWeight() && totalVolume <= smallContainer.calculateVolume()) {
+        while (totalWeight > 0 || totalVolume > 0) {
+            // First check if remaining items can fit into a small container
+            if (totalWeight <= smallContainer.getMaxWeight() && totalVolume <= smallContainer.calculateVolume()) {
                 smallContainersCount++;
                 totalPrice += smallContainer.calculatePrice(totalWeight);
                 totalWeight -= smallContainer.getMaxWeight();
                 totalVolume -= smallContainer.calculateVolume();
-            } else if (totalWeight > bigContainer.getMaxWeight()) {
+            }
+            // If not, use a big container
+            else if (totalWeight >= bigContainer.getMaxWeight() && totalVolume >= bigContainer.calculateVolume()) {
                 bigContainersCount++;
-                totalPrice += bigContainer.calculatePrice(bigContainer.getMaxWeight());
+                totalPrice += bigContainer.getPrice();
                 totalWeight -= bigContainer.getMaxWeight();
                 totalVolume -= bigContainer.calculateVolume();
-            } else if (totalWeight > smallContainer.getMaxWeight()) {
-                smallContainersCount++;
-                totalPrice += smallContainer.calculatePrice(smallContainer.getMaxWeight());
-                totalWeight -= smallContainer.getMaxWeight();
-                totalVolume -= smallContainer.calculateVolume();
             } else {
-                System.out.println("There are too many items to ship.");
-                return;
+                System.out.println("The remaining items cannot fit into a container. Please revise the item quantities or container types.");
+                break;
             }
         }
+
         System.out.println("The optimal shipping method is: " + bigContainersCount + " big containers and " + smallContainersCount + " small containers.");
         System.out.println("The best shipping cost is: " + totalPrice + " Euros.");
     }
